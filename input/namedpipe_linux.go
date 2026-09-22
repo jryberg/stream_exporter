@@ -7,7 +7,7 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {

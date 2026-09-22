@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	versioncollector "github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
+	log "github.com/sirupsen/logrus"
 
-	"github.com/carlpett/stream_exporter/input"
-	"github.com/carlpett/stream_exporter/linemetrics"
+	"github.com/jryberg/stream_exporter/input"
+	"github.com/jryberg/stream_exporter/linemetrics"
 )
 
 var (
@@ -59,10 +60,10 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf(version.Print("stream_exporter"))
+		fmt.Print(version.Print("stream_exporter"))
 		os.Exit(0)
 	}
-	prometheus.MustRegister(version.NewCollector("stream_exporter"))
+	prometheus.MustRegister(versioncollector.NewCollector("stream_exporter"))
 
 	// Startup tasks can be registered to perform (typically os-specific) initialization
 	for taskName, task := range startupTasks {

@@ -1,11 +1,12 @@
-FROM golang:1.12
-WORKDIR /go/src/github.com/carlpett/stream_exporter/
+FROM golang:1.26 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-RUN make build
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /stream_exporter .
 
 FROM busybox:glibc
-WORKDIR /usr/bin/
-COPY --from=0 /go/src/github.com/carlpett/stream_exporter/stream_exporter /usr/bin/stream_exporter
+COPY --from=build /stream_exporter /usr/bin/stream_exporter
 USER 1000
 ENTRYPOINT ["/usr/bin/stream_exporter"]
 EXPOSE 9178

@@ -1,6 +1,8 @@
 # Stream Exporter
 
-[![CircleCI](https://circleci.com/gh/carlpett/stream_exporter.svg?style=shield)](https://circleci.com/gh/carlpett/stream_exporter) [![DockerHub](https://img.shields.io/docker/build/carlpett/stream_exporter.svg?style=shield)](https://hub.docker.com/r/carlpett/stream_exporter/)
+[![ci](https://github.com/jryberg/stream_exporter/actions/workflows/ci.yaml/badge.svg)](https://github.com/jryberg/stream_exporter/actions/workflows/ci.yaml)
+
+This is a maintained fork of [carlpett/stream_exporter](https://github.com/carlpett/stream_exporter), which has been archived.
 
 A [Prometheus](https://prometheus.io) exporter for extracting metrics from streaming sources of text, such as logs written to a socket, or tailing a file.
 Extraction into metrics is done using regular expressions, on a per-line basis. Capture groups in the regular expression are used as labels in the metrics. All Prometheus metric types are supported, and fully configurable.
@@ -171,4 +173,4 @@ The `namedpipe` input has one parameter:
 - `input.namedpipe.path` (Required): The path where the pipe should be created. This may require elevated privileges to execute a `mkfifo` syscall.
 
 # Building
-The project uses [govendor](https://github.com/kardianos/govendor) for dependency management. To build the exporter, call `govendor build +p`.
+The project uses Go modules. To install the exporter, run `go install github.com/jryberg/stream_exporter@latest`, or build it from a checkout with `make build`. `make crossbuild` builds binaries for all supported platforms into `binaries/`.

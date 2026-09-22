@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hpcloud/tail"
-	"github.com/prometheus/common/log"
+	"github.com/nxadm/tail"
+	log "github.com/sirupsen/logrus"
 )
 
 type DryrunFileInput struct {
