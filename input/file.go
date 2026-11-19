@@ -1,7 +1,6 @@
 package input
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -55,13 +54,7 @@ func (input DryrunFileInput) StartStream(ch chan<- string) {
 	}
 	defer func() { _ = file.Close() }()
 
-	reader := bufio.NewReader(file)
-	scanner := bufio.NewScanner(reader)
-
-	for scanner.Scan() {
-		ch <- scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
+	if err := readLines(file, ch, input.path); err != nil {
 		log.Errorf("Error reading %s: %v", input.path, err)
 	}
 

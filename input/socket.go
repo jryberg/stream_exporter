@@ -1,7 +1,6 @@
 package input
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -54,11 +53,7 @@ func (socket SocketInput) StartStream(ch chan<- string) {
 		}
 		go func(c net.Conn) {
 			// TODO: Timeout + metrics for failed reads
-			scanner := bufio.NewScanner(c)
-			for scanner.Scan() {
-				ch <- scanner.Text()
-			}
-			if err := scanner.Err(); err != nil {
+			if err := readLines(c, ch, c.RemoteAddr().String()); err != nil {
 				log.Errorf("Error reading from %s: %v", c.RemoteAddr(), err)
 			}
 			_ = c.Close()

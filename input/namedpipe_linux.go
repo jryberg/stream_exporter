@@ -1,7 +1,6 @@
 package input
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"os"
@@ -48,13 +47,7 @@ func (input NamedPipeInput) StartStream(ch chan<- string) {
 		}
 	}()
 
-	reader := bufio.NewReader(pipe)
-	scanner := bufio.NewScanner(reader)
-
-	for scanner.Scan() {
-		ch <- scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
+	if err := readLines(pipe, ch, input.path); err != nil {
 		log.Errorf("Error reading %s: %v", input.path, err)
 	}
 }

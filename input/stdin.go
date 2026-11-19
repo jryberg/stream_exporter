@@ -1,7 +1,6 @@
 package input
 
 import (
-	"bufio"
 	"flag"
 	"os"
 
@@ -25,13 +24,7 @@ func newStdinInput() (StreamInput, error) {
 }
 
 func (input StdinInput) StartStream(ch chan<- string) {
-	reader := bufio.NewReader(os.Stdin)
-	scanner := bufio.NewScanner(reader)
-
-	for scanner.Scan() {
-		ch <- scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
+	if err := readLines(os.Stdin, ch, "stdin"); err != nil {
 		log.Errorf("Error reading stdin: %v", err)
 	}
 

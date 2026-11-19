@@ -40,6 +40,7 @@ Name     | Description | Default value
 `-config` | Path to the pattern configuration file | `stream_exporter.yaml`
 `-input.type` | What input module to use | _(Required)_
 `-input.print` | Prints available input modules and exits | -
+`-input.max-line-size` | Maximum length in bytes of a line read from `stdin`, `socket`, `namedpipe` or `file` in `dryrun` mode. Longer lines are skipped with a warning and counted in `stream_exporter_line_processing_lines_skipped_total`, and reading continues. Tailed files have no limit | `1048576` (1 MiB)
 `-web.listen-address` | Address on which to expose metrics | `:9178`
 `-web.metrics-path` | Path under which the metrics are available | `/metrics`
 `-log.level` | Only log messages with the given severity or above. Valid levels are `debug`, `info`, `warn`, `error` and `fatal` | `info`

@@ -103,6 +103,7 @@ func main() {
 
 	prometheus.MustRegister(lineProcessingTime)
 	prometheus.MustRegister(totalLines)
+	prometheus.MustRegister(input.SkippedLines)
 
 	// Setup signal handling
 	signal.Notify(quitSig, os.Interrupt)
