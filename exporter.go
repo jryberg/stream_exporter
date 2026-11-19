@@ -59,6 +59,11 @@ var startupTasks = make(map[string]startupTask, 0)
 func main() {
 	flag.Parse()
 
+	if err := configureLogging(*logLevel, *logFormat); err != nil {
+		fmt.Fprintf(os.Stderr, "Could not configure logging: %v\n", err)
+		os.Exit(1)
+	}
+
 	if *showVersion {
 		fmt.Print(version.Print("stream_exporter"))
 		os.Exit(0)

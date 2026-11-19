@@ -42,6 +42,8 @@ Name     | Description | Default value
 `-input.print` | Prints available input modules and exits | -
 `-web.listen-address` | Address on which to expose metrics | `:9178`
 `-web.metrics-path` | Path under which the metrics are available | `/metrics`
+`-log.level` | Only log messages with the given severity or above. Valid levels are `debug`, `info`, `warn`, `error` and `fatal` | `info`
+`-log.format` | Log target and format, as `logger:<target>`. Targets are `stderr`, `stdout`, `syslog?appname=<name>&local=<0-7>` (not on Windows) and `eventlog?name=<name>` (Windows only). Add `json=true` to any target for JSON output, for example `logger:stdout?json=true`. Syslog and eventlog are written in addition to stderr | `logger:stderr`
 
 
 # Pattern configuration
