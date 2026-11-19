@@ -4,6 +4,7 @@ package linemetrics
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -38,10 +39,22 @@ func ReadPatternConfig(path string) ([]MetricsConfig, error) {
 		return nil, err
 	}
 
+	// Strict, so that a misspelled key is an error rather than a silently empty field
 	var config config
-	err = yaml.Unmarshal(content, &config)
+	err = yaml.UnmarshalStrict(content, &config)
 	if err != nil {
 		return nil, err
+	}
+
+	seen := make(map[string]bool, len(config.Metrics))
+	for i, m := range config.Metrics {
+		if err := m.validate(); err != nil {
+			return nil, fmt.Errorf("metric %d (%q): %w", i+1, m.Name, err)
+		}
+		if seen[m.Name] {
+			return nil, fmt.Errorf("metric %d (%q): name is already used by another metric", i+1, m.Name)
+		}
+		seen[m.Name] = true
 	}
 
 	return config.Metrics, nil

@@ -49,7 +49,7 @@ Name     | Description | Default value
 
 # Pattern configuration
 
-The pattern configuration is a yaml file consisting of a top level list, `metrics`. The elements in this list have the following structure:
+The pattern configuration is a yaml file consisting of a top level list, `metrics`. The configuration is checked at startup, and the exporter exits with an error on unknown keys, unknown kinds, missing names or patterns, invalid or duplicate metric names, invalid regular expressions, and unnamed capture groups (use `(?:...)` for grouping). The elements in this list have the following structure:
 
 ```yaml
   - name: metric_name

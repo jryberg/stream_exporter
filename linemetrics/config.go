@@ -1,6 +1,10 @@
 package linemetrics
 
 import (
+	"errors"
+	"fmt"
+	"regexp"
+	"slices"
 	"time"
 )
 
@@ -20,6 +24,35 @@ type MetricsConfig struct {
 
 	HistogramConfig `yaml:",inline"`
 	SummaryConfig   `yaml:",inline"`
+}
+
+// validate catches configuration mistakes that would otherwise panic at startup or silently match every line
+func (c MetricsConfig) validate() error {
+	if c.Name == "" {
+		return errors.New("name is not set")
+	}
+	switch c.Kind {
+	case counter, gauge, histogram, summary:
+	default:
+		return fmt.Errorf("unknown kind %q, valid kinds are counter, gauge, histogram and summary", c.Kind)
+	}
+	if c.Pattern == "" {
+		return errors.New("pattern is not set")
+	}
+	pattern, err := regexp.Compile(c.Pattern)
+	if err != nil {
+		return err
+	}
+	labels := pattern.SubexpNames()[1:] // First element is entire expression
+	if slices.Contains(labels, "") {
+		return errors.New("pattern has an unnamed capture group, use (?P<name>...) for a label or (?:...) for grouping")
+	}
+	if c.Kind != counter {
+		if _, err := getValueCaptureIndex(labels); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 type HistogramConfig struct {

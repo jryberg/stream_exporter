@@ -98,7 +98,9 @@ func main() {
 	for _, definition := range metricsConfig {
 		lineMetric, collector := linemetrics.NewLineMetric(definition)
 		metrics = append(metrics, lineMetric)
-		prometheus.MustRegister(collector)
+		if err := prometheus.Register(collector); err != nil {
+			log.Fatalf("Could not register metric %q: %v", definition.Name, err)
+		}
 	}
 
 	prometheus.MustRegister(lineProcessingTime)
