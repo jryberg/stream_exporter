@@ -1,7 +1,8 @@
+// Package input provides the stream sources that feed lines to the exporter.
+// Each input registers itself from init() and is selected with -input.type.
 package input
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -26,7 +27,7 @@ func GetAvailableInputs() []string {
 func NewInput(inputType string) (StreamInput, error) {
 	factory, registered := inputTypes[inputType]
 	if !registered {
-		return nil, errors.New(fmt.Sprintf("Unknown input type %v", inputType))
+		return nil, fmt.Errorf("unknown input type %v", inputType)
 	}
 	return factory()
 }

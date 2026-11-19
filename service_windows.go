@@ -25,7 +25,7 @@ func init() {
 func processServiceInstallationFlags() error {
 	if *installService {
 		if *serviceName == "" {
-			return fmt.Errorf("Cannot install service, name not set")
+			return fmt.Errorf("cannot install service, name not set")
 		}
 		err := install(*serviceName)
 		if err != nil {
@@ -36,7 +36,7 @@ func processServiceInstallationFlags() error {
 		}
 	} else if *uninstallService {
 		if *serviceName == "" {
-			return fmt.Errorf("Cannot uninstall service, name not set")
+			return fmt.Errorf("cannot uninstall service, name not set")
 		}
 		err := uninstall(*serviceName)
 		if err != nil {
@@ -62,7 +62,7 @@ func runAsServiceIfNoninteractive() error {
 
 	if !isInteractive {
 		if *serviceName == "" {
-			return fmt.Errorf("Cannot start service, name not set")
+			return fmt.Errorf("cannot start service, name not set")
 		}
 		log.Debugf("Starting service %s", *serviceName)
 		go svc.Run(*serviceName, &streamExporterService{stopCh: quitSig})
@@ -80,18 +80,15 @@ func (s *streamExporterService) Execute(args []string, r <-chan svc.ChangeReques
 	changes <- svc.Status{State: svc.StartPending}
 	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 loop:
-	for {
-		select {
-		case c := <-r:
-			switch c.Cmd {
-			case svc.Interrogate:
-				changes <- c.CurrentStatus
-			case svc.Stop, svc.Shutdown:
-				s.stopCh <- os.Interrupt
-				break loop
-			default:
-				log.Error(fmt.Sprintf("Unexpected control request #%d", c))
-			}
+	for c := range r {
+		switch c.Cmd {
+		case svc.Interrogate:
+			changes <- c.CurrentStatus
+		case svc.Stop, svc.Shutdown:
+			s.stopCh <- os.Interrupt
+			break loop
+		default:
+			log.Error(fmt.Sprintf("Unexpected control request #%d", c))
 		}
 	}
 	changes <- svc.Status{State: svc.StopPending}
@@ -103,7 +100,7 @@ loop:
 func install(name string) error {
 	exepath, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("Could not determine own path, %s", err)
+		return fmt.Errorf("could not determine own path, %s", err)
 	}
 
 	m, err := mgr.Connect()
@@ -115,7 +112,7 @@ func install(name string) error {
 	s, err := m.OpenService(name)
 	if err == nil {
 		s.Close()
-		return fmt.Errorf("Service %s already exists", name)
+		return fmt.Errorf("service %s already exists", name)
 	}
 	config := mgr.Config{
 		DisplayName: name,
@@ -173,19 +170,19 @@ func uninstall(name string) error {
 
 	s, err := m.OpenService(name)
 	if err != nil {
-		return fmt.Errorf("Service %q is not installed", name)
+		return fmt.Errorf("service %q is not installed", name)
 	}
 	defer s.Close()
 
 	status, err := s.Query()
 	if err != nil {
-		return fmt.Errorf("Could not query for service %q state: %v", name, err)
+		return fmt.Errorf("could not query for service %q state: %v", name, err)
 	}
 
 	if status.State != svc.Stopped {
 		_, err := s.Control(svc.Stop)
 		if err != nil {
-			return fmt.Errorf("Could not send stop signal to service %q", err)
+			return fmt.Errorf("could not send stop signal to service %q", err)
 		}
 	}
 

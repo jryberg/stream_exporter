@@ -1,8 +1,10 @@
+// Package linemetrics turns configured regular expressions into Prometheus
+// metrics that are updated for each matching line.
 package linemetrics
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"strconv"
 
@@ -31,7 +33,7 @@ type config struct {
 }
 
 func ReadPatternConfig(path string) ([]MetricsConfig, error) {
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +83,7 @@ func getValueCaptureIndex(labels []string) (int, error) {
 		}
 	}
 	if !foundValue {
-		return valueIdx, errors.New("No named capture group for 'value'")
+		return valueIdx, errors.New("no named capture group for 'value'")
 	}
 
 	return valueIdx, nil

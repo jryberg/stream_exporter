@@ -28,7 +28,7 @@ func newSocketInput() (StreamInput, error) {
 	if *socketFamily == "" {
 		return nil, errors.New("-input.socket.family not set")
 	} else if *socketFamily != "tcp" && *socketFamily != "udp" && *socketFamily != "domain" {
-		return nil, errors.New(fmt.Sprintf("%q is not a valid value for -input.socket.family", *socketFamily))
+		return nil, fmt.Errorf("%q is not a valid value for -input.socket.family", *socketFamily)
 	}
 
 	if *socketListenAddr == "" {

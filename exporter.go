@@ -140,7 +140,6 @@ func main() {
 		case <-quitSig:
 			log.Info("Received quit signal, shutting down...")
 			done = true
-			break
 		}
 	}
 }

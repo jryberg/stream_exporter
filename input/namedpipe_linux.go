@@ -10,6 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type NamedPipeInput struct {
+	path string
+}
+
 func init() {
 	registerInput("namedpipe", newNamedPipeInput)
 }

@@ -42,7 +42,7 @@ func newFileInput() (StreamInput, error) {
 			path: *filePath,
 		}, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("Unknown value %q for -input.file.mode", *mode))
+		return nil, fmt.Errorf("unknown value %q for -input.file.mode", *mode)
 	}
 }
 

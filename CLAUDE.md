@@ -27,7 +27,7 @@ Try a config end to end without a server: `./stream_exporter -config c.yaml -inp
 **Self-registration via `init()`.** Most extension points are global registries filled from `init()` functions, so adding a file is enough to wire it in:
 - `input/`: each input file calls `registerInput(name, factory)` and declares its own package-level `flag` vars prefixed `input.<name>.`. The factory validates flags and returns a `StreamInput` (`StartStream(ch chan<- string)`). Inputs treat runtime errors as fatal (`log.Fatal`).
 - `main`: OS-specific files add entries to `startupTasks`, which run after `flag.Parse()`. `service_windows.go` uses this to install, uninstall or run as a Windows service, and stops the process by sending on `quitSig`.
-- Platform restriction uses filename suffixes (`_linux.go`, `_windows.go`), not `//go:build` tags. Shared types live in the unsuffixed file (`namedpipe.go`).
+- Platform restriction uses filename suffixes (`_linux.go`, `_windows.go`) where a single GOOS fits, and a `//go:build` tag only where it doesn't (`logging_syslog.go` is `unix`, i.e. everything but Windows).
 
 **`linemetrics/`.** `ReadPatternConfig` unmarshals YAML (`gopkg.in/yaml.v2`) into `MetricsConfig`; `HistogramConfig` and `SummaryConfig` are embedded `inline`, so their keys sit at the same level as `name`/`kind`/`pattern`. `NewLineMetric` compiles the regex and uses its named capture groups as label names. Each kind has a plain and a `*Vec` implementation, picked by whether the pattern has capture groups. For gauge, histogram and summary, the capture group named `value` is required: it is parsed as a float and removed from the labels (`getValueCaptureIndex` / `getLabelsAndValue`). Metric help text is the metric name.
 

@@ -36,7 +36,7 @@ func newSyslogInput() (StreamInput, error) {
 	if *syslogListenFamily == "" {
 		return nil, errors.New("-input.syslog.listenfamily not set")
 	} else if *syslogListenFamily != "tcp" && *syslogListenFamily != "udp" && *syslogListenFamily != "unix" {
-		return nil, errors.New(fmt.Sprintf("%q is not a valid value for -input.syslog.listenfamily", *syslogListenFamily))
+		return nil, fmt.Errorf("%q is not a valid value for -input.syslog.listenfamily", *syslogListenFamily)
 	}
 
 	if *syslogListenAddr == "" {
@@ -56,7 +56,7 @@ func newSyslogInput() (StreamInput, error) {
 	case "rfc6587":
 		syslogFormat = syslog.RFC6587
 	default:
-		return nil, errors.New(fmt.Sprintf("%q is not a valid value for -input.syslog.format", *syslogFormatFlag))
+		return nil, fmt.Errorf("%q is not a valid value for -input.syslog.format", *syslogFormatFlag)
 	}
 
 	return SyslogInput{
@@ -127,6 +127,6 @@ func tmplTagFunc(w io.Writer, tag string, m map[string]interface{}) (int, error)
 	case fmt.Stringer:
 		return w.Write([]byte(value.String()))
 	default:
-		return w.Write([]byte(fmt.Sprintf("%v", v)))
+		return fmt.Fprintf(w, "%v", v)
 	}
 }
