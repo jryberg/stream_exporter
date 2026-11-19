@@ -5,8 +5,8 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /stream_exporter .
 
-FROM busybox:glibc@sha256:99813cb178ace2cd9c6c53ee3bddef5d2f5708aa438335111d7a9e3c5e1aaebe
+FROM gcr.io/distroless/static-debian13@sha256:1a64f46364620465ef9e9a8f5413757dfdf22695e050bbfd7303eeaf17a59383
 COPY --from=build /stream_exporter /usr/bin/stream_exporter
-USER 1000
+USER 1000:1000
 ENTRYPOINT ["/usr/bin/stream_exporter"]
 EXPOSE 9178
