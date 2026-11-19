@@ -58,6 +58,7 @@ func (input DryrunFileInput) StartStream(ch chan<- string) {
 		log.Errorf("Error reading %s: %v", input.path, err)
 	}
 
+	waitForProcessing()
 	fmt.Println("Finished reading file, dumping final metrics endpoint output:")
 	writeMetrics(os.Stdout)
 }

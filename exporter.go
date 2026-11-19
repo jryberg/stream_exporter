@@ -140,6 +140,8 @@ func main() {
 				lineProcessingTime.WithLabelValues(m.Name()).Observe(time.Since(t).Seconds())
 			}
 			totalLines.Inc()
+		case <-input.LinesProcessed:
+			// Nothing to do, receiving tells the input that all lines sent before are processed
 		case <-quitSig:
 			log.Info("Received quit signal, shutting down...")
 			done = true

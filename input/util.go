@@ -25,6 +25,16 @@ var (
 	)
 )
 
+// LinesProcessed is received from by the main loop only between lines. Since the line channel is
+// unbuffered, sending a line only means the main loop got it, not that its metrics are updated, but a
+// send on LinesProcessed completes only once every line sent before it has been fully processed
+var LinesProcessed = make(chan struct{})
+
+// waitForProcessing blocks until all lines sent so far are reflected in the metrics
+func waitForProcessing() {
+	LinesProcessed <- struct{}{}
+}
+
 // readLines sends each line read from r to ch until EOF, skipping lines longer than -input.max-line-size
 func readLines(r io.Reader, ch chan<- string, source string) error {
 	limit := *maxLineSize

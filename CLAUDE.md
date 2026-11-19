@@ -24,7 +24,7 @@ Try a config end to end without a server: `./stream_exporter -config c.yaml -inp
 
 ## Architecture
 
-`exporter.go` (package `main`) parses flags, builds one `LineMetric` per configured pattern, starts the chosen input in a goroutine, and loops reading lines from a `chan string`, calling `MatchLine` on every metric for every line. The loop ends when the input closes the channel or a quit signal arrives. Inputs that finish (file `dryrun`, stdin with `-input.stdin.quit-on-eof`) close the channel to make the process exit.
+`exporter.go` (package `main`) parses flags, builds one `LineMetric` per configured pattern, starts the chosen input in a goroutine, and loops reading lines from a `chan string`, calling `MatchLine` on every metric for every line. The loop ends when the input closes the channel or a quit signal arrives. Inputs that finish (file `dryrun`, stdin with `-input.stdin.quit-on-eof`) close the channel to make the process exit. The channel is unbuffered, so a completed send only means the main loop received the line, not that the metrics are updated. An input that reads the metrics itself (`writeMetrics` at EOF) must call `waitForProcessing()` first, which sends on `input.LinesProcessed`, a channel the main loop only receives from between lines.
 
 **Self-registration via `init()`.** Most extension points are global registries filled from `init()` functions, so adding a file is enough to wire it in:
 - `input/`: each input file calls `registerInput(name, factory)` and declares its own package-level `flag` vars prefixed `input.<name>.`. The factory validates flags and returns a `StreamInput` (`StartStream(ch chan<- string)`). Inputs treat runtime errors as fatal (`log.Fatal`).

@@ -29,6 +29,7 @@ func (input StdinInput) StartStream(ch chan<- string) {
 	}
 
 	if *writeOnEOF {
+		waitForProcessing()
 		writeMetrics(os.Stdout)
 	}
 	if *quitOnEOF {
