@@ -19,7 +19,7 @@ var (
 
 func init() {
 	startupTasks["processServiceInstallationFlags"] = processServiceInstallationFlags
-	startupTasks["runAsService"] = runAsServiceIfNoninteractive
+	startupTasks["runAsService"] = runAsServiceIfStartedByServiceManager
 }
 
 func processServiceInstallationFlags() error {
@@ -50,17 +50,17 @@ func processServiceInstallationFlags() error {
 	return nil
 }
 
-func runAsServiceIfNoninteractive() error {
+func runAsServiceIfStartedByServiceManager() error {
 	if *installService || *uninstallService {
 		return nil
 	}
 
-	isInteractive, err := svc.IsAnInteractiveSession()
+	isService, err := svc.IsWindowsService()
 	if err != nil {
 		return err
 	}
 
-	if !isInteractive {
+	if isService {
 		if *serviceName == "" {
 			return fmt.Errorf("cannot start service, name not set")
 		}
