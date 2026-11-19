@@ -1,0 +1,4 @@
+trust:
+  packages:
+    - docker:library/busybox
+    - docker:library/golang
