@@ -53,13 +53,16 @@ func (input DryrunFileInput) StartStream(ch chan<- string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	reader := bufio.NewReader(file)
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
 		ch <- scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		log.Errorf("Error reading %s: %v", input.path, err)
 	}
 
 	fmt.Println("Finished reading file, dumping final metrics endpoint output:")

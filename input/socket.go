@@ -46,7 +46,7 @@ func (socket SocketInput) StartStream(ch chan<- string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer l.Close()
+	defer func() { _ = l.Close() }()
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -54,11 +54,14 @@ func (socket SocketInput) StartStream(ch chan<- string) {
 		}
 		go func(c net.Conn) {
 			// TODO: Timeout + metrics for failed reads
-			scanner := bufio.NewScanner(conn)
+			scanner := bufio.NewScanner(c)
 			for scanner.Scan() {
 				ch <- scanner.Text()
 			}
-			c.Close()
+			if err := scanner.Err(); err != nil {
+				log.Errorf("Error reading from %s: %v", c.RemoteAddr(), err)
+			}
+			_ = c.Close()
 		}(conn)
 	}
 }

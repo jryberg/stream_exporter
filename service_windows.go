@@ -65,7 +65,11 @@ func runAsServiceIfNoninteractive() error {
 			return fmt.Errorf("cannot start service, name not set")
 		}
 		log.Debugf("Starting service %s", *serviceName)
-		go svc.Run(*serviceName, &streamExporterService{stopCh: quitSig})
+		go func() {
+			if err := svc.Run(*serviceName, &streamExporterService{stopCh: quitSig}); err != nil {
+				log.Fatalf("Could not run service %s: %v", *serviceName, err)
+			}
+		}()
 	}
 
 	return nil
@@ -107,11 +111,11 @@ func install(name string) error {
 	if err != nil {
 		return err
 	}
-	defer m.Disconnect()
+	defer func() { _ = m.Disconnect() }()
 
 	s, err := m.OpenService(name)
 	if err == nil {
-		s.Close()
+		_ = s.Close()
 		return fmt.Errorf("service %s already exists", name)
 	}
 	config := mgr.Config{
@@ -124,11 +128,13 @@ func install(name string) error {
 	if err != nil {
 		return err
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 
 	err = eventlog.InstallAsEventCreate(name, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
-		s.Delete()
+		if delErr := s.Delete(); delErr != nil {
+			return fmt.Errorf("Install() failed: %s, and removing the service also failed: %s", err, delErr)
+		}
 		return fmt.Errorf("Install() failed: %s", err)
 	}
 	return nil
@@ -166,13 +172,13 @@ func uninstall(name string) error {
 	if err != nil {
 		return err
 	}
-	defer m.Disconnect()
+	defer func() { _ = m.Disconnect() }()
 
 	s, err := m.OpenService(name)
 	if err != nil {
 		return fmt.Errorf("service %q is not installed", name)
 	}
-	defer s.Close()
+	defer func() { _ = s.Close() }()
 
 	status, err := s.Query()
 	if err != nil {

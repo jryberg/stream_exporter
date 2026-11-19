@@ -42,12 +42,19 @@ func (input NamedPipeInput) StartStream(ch chan<- string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer os.Remove(input.path)
+	defer func() {
+		if err := os.Remove(input.path); err != nil {
+			log.Warnf("Could not remove named pipe: %v", err)
+		}
+	}()
 
 	reader := bufio.NewReader(pipe)
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
 		ch <- scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		log.Errorf("Error reading %s: %v", input.path, err)
 	}
 }

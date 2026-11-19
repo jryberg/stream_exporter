@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"flag"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -28,6 +30,9 @@ func (input StdinInput) StartStream(ch chan<- string) {
 
 	for scanner.Scan() {
 		ch <- scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		log.Errorf("Error reading stdin: %v", err)
 	}
 
 	if *writeOnEOF {

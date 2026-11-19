@@ -21,5 +21,7 @@ func writeMetrics(w io.Writer) {
 			log.Fatal(err)
 		}
 	}
-	fmt.Fprintln(w, out)
+	if _, err := fmt.Fprintln(w, out); err != nil {
+		log.Fatal(err)
+	}
 }
