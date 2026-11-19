@@ -10,13 +10,15 @@ Prometheus exporter that reads lines from a streaming input (file, socket, syslo
 make build                     # go build with version ldflags (VERSION from git describe --tags)
 make test                      # go test -v -cover ./...
 go test ./linemetrics -run TestUnmarshalHistogramConfig   # single test
-go test ./input -bench .       # syslog message handler benchmark (input/ has no unit tests)
+go test ./input -bench .       # syslog message handler benchmark
 go vet ./...                   # CI runs this
+golangci-lint run ./...        # default linters, no config file; CI runs this
+GOOS=windows golangci-lint run ./...   # needed to lint service_windows.go and logging_windows.go
 make crossbuild                # CGO_ENABLED=0 binaries for linux/windows/darwin into binaries/
 make docker
 ```
 
-CI (`.github/workflows/ci.yaml`) runs vet, `make test` and `make crossbuild`. Crossbuild matters because `service_windows.go` and `input/namedpipe_linux.go` only compile on their OS, so a change can build locally and still break another platform. Go version comes from `go.mod`; the version is pinned in `go.mod`, `.promu.yml` and the `Dockerfile` (digest-pinned image), so bump all three together.
+CI (`.github/workflows/ci.yaml`) runs vet, `make test`, `make crossbuild`, and golangci-lint v2.15.0 for both GOOS=linux and GOOS=windows. Crossbuild matters because `service_windows.go` and `input/namedpipe_linux.go` only compile on their OS, so a change can build locally and still break another platform. Go version comes from `go.mod`; the version is pinned in `go.mod`, `.promu.yml` and the `Dockerfile` (digest-pinned image), so bump all three together.
 
 Try a config end to end without a server: `./stream_exporter -config c.yaml -input.type file -input.file.path some.log -input.file.mode dryrun` processes the file, prints the metrics output and exits.
 
