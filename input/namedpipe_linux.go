@@ -19,7 +19,7 @@ var (
 )
 
 func newNamedPipeInput() (StreamInput, error) {
-	if *filePath == "" {
+	if *pipePath == "" {
 		return nil, errors.New("-input.namedpipe.path not set")
 	}
 
